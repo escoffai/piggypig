@@ -1,0 +1,36 @@
+{
+  "id": "level-01",
+  "title": "First Flow",
+  "image": "levels/level-01.png",
+  "palette": {
+    "#e74c3c": "red",
+    "#3498db": "blue",
+    "#2ecc71": "green",
+    "#f1c40f": "yellow",
+    "#e91e63": "pink",
+    "#9b59b6": "purple",
+    "#e67e22": "orange",
+    "#fefefe": "white",
+    "#111111": "black"
+  },
+  "belt": {
+    "capacity": 2,
+    "speed": 220,
+    "path": [
+      { "x": 132, "y": 640 },
+      { "x": 132, "y": 220 },
+      { "x": 588, "y": 220 },
+      { "x": 588, "y": 640 },
+      { "x": 132, "y": 640 }
+    ]
+  },
+  "board": {
+    "originX": 232,
+    "originY": 300,
+    "cellSize": 64
+  },
+  "inventory": [
+    { "color": "green", "ammo": 16 }
+  ],
+  "win": { "type": "clearAllCubes" }
+}

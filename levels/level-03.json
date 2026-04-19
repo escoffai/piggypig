@@ -1,0 +1,38 @@
+{
+  "id": "level-03",
+  "title": "Heart",
+  "image": "levels/level-03.png",
+  "palette": {
+    "#e74c3c": "red",
+    "#3498db": "blue",
+    "#2ecc71": "green",
+    "#f1c40f": "yellow",
+    "#e91e63": "pink",
+    "#9b59b6": "purple",
+    "#e67e22": "orange",
+    "#fefefe": "white",
+    "#111111": "black"
+  },
+  "belt": {
+    "capacity": 2,
+    "speed": 260,
+    "path": [
+      { "x": 84, "y": 700 },
+      { "x": 84, "y": 220 },
+      { "x": 636, "y": 220 },
+      { "x": 636, "y": 700 },
+      { "x": 84, "y": 700 }
+    ]
+  },
+  "board": {
+    "originX": 164,
+    "originY": 300,
+    "cellSize": 56
+  },
+  "inventory": [
+    { "color": "red", "ammo": 9 },
+    { "color": "red", "ammo": 9 },
+    { "color": "red", "ammo": 9 }
+  ],
+  "win": { "type": "clearAllCubes" }
+}

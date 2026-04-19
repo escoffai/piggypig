@@ -1,0 +1,38 @@
+{
+  "id": "level-02",
+  "title": "Cactus",
+  "image": "levels/level-02.png",
+  "palette": {
+    "#e74c3c": "red",
+    "#3498db": "blue",
+    "#2ecc71": "green",
+    "#f1c40f": "yellow",
+    "#e91e63": "pink",
+    "#9b59b6": "purple",
+    "#e67e22": "orange",
+    "#fefefe": "white",
+    "#111111": "black"
+  },
+  "belt": {
+    "capacity": 3,
+    "speed": 240,
+    "path": [
+      { "x": 112, "y": 700 },
+      { "x": 112, "y": 220 },
+      { "x": 608, "y": 220 },
+      { "x": 608, "y": 700 },
+      { "x": 112, "y": 700 }
+    ]
+  },
+  "board": {
+    "originX": 192,
+    "originY": 300,
+    "cellSize": 56
+  },
+  "inventory": [
+    { "color": "yellow", "ammo": 8 },
+    { "color": "green", "ammo": 16 },
+    { "color": "pink", "ammo": 2 }
+  ],
+  "win": { "type": "clearAllCubes" }
+}
