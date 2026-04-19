@@ -193,10 +193,25 @@ piggypig/
 npm run test
 ```
 
-Coverage spans the five systems from the PROMPT plus the lock evaluator and the
-PNG loader: LOS raycast (match/mismatch/empty), capacity gate, chain
-all-or-nothing, hidden front-of-queue, lock grammar, slot park/redeploy, and
-every win/fail branch from GDD §9.
+Coverage spans three layers:
+
+- **Pure systems** (Belt, Shooting, Inventory, WaitingSlots, WinFail, Locks,
+  Progress) — every branch of the GDD rules.
+- **Loaders** — PNG pixel decode → cube grid.
+- **End-to-end solvability** — a Vitest integration suite loads every shipped
+  level off disk, feeds it to a greedy auto-player, and asserts `status === 'won'`
+  under the sim. This catches any ammo/capacity miscalibration before a human
+  ever sees the level.
+
+## Progression & tutorial
+
+- Level 1 runs a floating-hand pointer over the first inventory pig on first
+  launch; the same pointer reappears on a waiting slot the first time a pig
+  parks in one (seen-flags persist in `localStorage`).
+- Completing a level records a star rating (3 / 2 / 1) based on inventory
+  efficiency and unlocks the next entry on the title screen.
+- Progress is stored under `pixel-flow-progress-v1`. Clear it via DevTools
+  → Application → Local Storage to replay from scratch.
 
 ---
 

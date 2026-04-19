@@ -15,6 +15,7 @@ import {
 } from '../config';
 import { isEntryTappable } from '../systems/InventorySystem';
 import { evaluateLock } from '../systems/Locks';
+import { loadProgress, markTutorialSeen } from '../systems/Progress';
 import { isMuted, setMuted, sfxTap } from '../systems/SoundSystem';
 import type { GameState, InventoryEntry, Pig, Slot } from '../types';
 
@@ -44,6 +45,7 @@ export class UIScene extends Phaser.Scene {
   private muteBtn!: Phaser.GameObjects.Text;
   private slotsY = 0;
   private invY = 0;
+  private tutorialPointer?: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -93,6 +95,7 @@ export class UIScene extends Phaser.Scene {
 
     this.buildSlots();
     this.buildInventory();
+    this.maybeShowInventoryTutorial();
 
     // Event wiring.
     this.events.on('pf:ui-tick', (onBelt: number, capacity: number) => {
@@ -101,14 +104,21 @@ export class UIScene extends Phaser.Scene {
       this.refreshInventoryLockStates();
     });
     this.events.on('pf:ui-blocked', () => this.flashCapacityRed());
-    this.events.on('pf:ui-park', (slotIndex: number, pig: Pig) =>
-      this.renderSlotContents(slotIndex, pig),
+    this.events.on('pf:ui-park', (slotIndex: number, pig: Pig) => {
+      this.renderSlotContents(slotIndex, pig);
+      this.maybeShowSlotTutorial(slotIndex);
+    });
+    this.events.on('pf:ui-slot-changed', (slotIndex: number) => {
+      this.renderSlotContents(slotIndex, null);
+      this.clearTutorial();
+    });
+    this.events.on('pf:ui-inventory-changed', () => {
+      this.rebuildInventoryLayout();
+      this.clearTutorial();
+    });
+    this.events.on('pf:ui-result', (outcome: 'won' | 'lost', stars: number) =>
+      this.showResult(outcome, stars),
     );
-    this.events.on('pf:ui-slot-changed', (slotIndex: number) =>
-      this.renderSlotContents(slotIndex, null),
-    );
-    this.events.on('pf:ui-inventory-changed', () => this.rebuildInventoryLayout());
-    this.events.on('pf:ui-result', (outcome: 'won' | 'lost') => this.showResult(outcome));
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.removeAllListeners();
@@ -356,7 +366,7 @@ export class UIScene extends Phaser.Scene {
 
   // -- Result panel --
 
-  private showResult(outcome: 'won' | 'lost'): void {
+  private showResult(outcome: 'won' | 'lost', stars: number): void {
     if (this.resultPanel) return;
     const w = LOGICAL_WIDTH * 0.82;
     const h = 360;
@@ -372,10 +382,6 @@ export class UIScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    const stars =
-      outcome === 'won'
-        ? this.computeStars(this.state.level.inventory.length - this.state.inventory.length)
-        : 0;
     const starText = this.add
       .text(0, -50, outcome === 'won' ? '★'.repeat(stars).padEnd(3, '☆') : ' ', {
         fontFamily: 'Arial Black, Arial, sans-serif',
@@ -414,13 +420,62 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  private computeStars(used: number): number {
-    const total = this.state.level.inventory.length;
-    if (total <= 0) return 3;
-    const ratio = used / total;
-    if (ratio <= 0.6) return 3;
-    if (ratio <= 0.85) return 2;
-    return 1;
+  private maybeShowInventoryTutorial(): void {
+    const levelId = this.registry.get('levelId') as string | undefined;
+    if (levelId !== 'level-01') return;
+    const p = loadProgress();
+    if (p.tutorial.inventorySeen) return;
+    if (this.invNodes.length === 0) return;
+    const first = this.invNodes[0];
+    const pointer = this.add
+      .text(first.bg.x + 38, first.bg.y + 38, '👆', {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '56px',
+      })
+      .setOrigin(0.5);
+    pointer.setDepth(1000);
+    this.tweens.add({
+      targets: pointer,
+      y: first.bg.y + 58,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+    this.tutorialPointer = pointer;
+    markTutorialSeen('inventory');
+  }
+
+  private maybeShowSlotTutorial(slotIndex: number): void {
+    const p = loadProgress();
+    if (p.tutorial.slotSeen) return;
+    const node = this.slotNodes[slotIndex];
+    if (!node) return;
+    this.clearTutorial();
+    const pointer = this.add
+      .text(node.bg.x + 28, node.bg.y + 30, '👆', {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '48px',
+      })
+      .setOrigin(0.5);
+    pointer.setDepth(1000);
+    this.tweens.add({
+      targets: pointer,
+      y: node.bg.y + 50,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+    this.tutorialPointer = pointer;
+    markTutorialSeen('slot');
+  }
+
+  private clearTutorial(): void {
+    if (this.tutorialPointer) {
+      this.tutorialPointer.destroy();
+      this.tutorialPointer = undefined;
+    }
   }
 
   private makeButton(

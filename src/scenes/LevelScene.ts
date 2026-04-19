@@ -15,6 +15,7 @@ import { buildLevel, initialState, type LevelJson } from '../loaders/levelLoader
 import { pixelImageFromImage } from '../loaders/pngLevelLoader';
 import { tickBelt } from '../systems/BeltSystem';
 import { deployFromInventory } from '../systems/InventorySystem';
+import { recordLevelCleared } from '../systems/Progress';
 import { resolveHits } from '../systems/ShootingSystem';
 import { parkLoopedPigs, redeployFromSlot } from '../systems/WaitingSlotsSystem';
 import { applyOutcome } from '../systems/WinFailSystem';
@@ -349,13 +350,25 @@ export class LevelScene extends Phaser.Scene {
     this.state.status = 'won';
     sfxLevelClear();
     this.confettiSweep();
-    (this.scene.get('UIScene') as Phaser.Scene).events.emit('pf:ui-result', 'won');
+    const stars = this.computeStars();
+    recordLevelCleared(this.levelId, stars);
+    (this.scene.get('UIScene') as Phaser.Scene).events.emit('pf:ui-result', 'won', stars);
+  }
+
+  private computeStars(): number {
+    const total = this.state.level.inventory.length;
+    if (total <= 0) return 3;
+    const used = total - this.state.inventory.length;
+    const ratio = used / total;
+    if (ratio <= 0.6) return 3;
+    if (ratio <= 0.85) return 2;
+    return 1;
   }
 
   private handleLose(): void {
     this.state.status = 'lost';
     sfxFail();
-    (this.scene.get('UIScene') as Phaser.Scene).events.emit('pf:ui-result', 'lost');
+    (this.scene.get('UIScene') as Phaser.Scene).events.emit('pf:ui-result', 'lost', 0);
   }
 
   private confettiSweep(): void {
