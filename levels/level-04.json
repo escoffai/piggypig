@@ -1,0 +1,39 @@
+{
+  "id": "level-04",
+  "title": "Flag",
+  "image": "levels/level-04.png",
+  "palette": {
+    "#e74c3c": "red",
+    "#3498db": "blue",
+    "#2ecc71": "green",
+    "#f1c40f": "yellow",
+    "#e91e63": "pink",
+    "#9b59b6": "purple",
+    "#e67e22": "orange",
+    "#fefefe": "white",
+    "#111111": "black"
+  },
+  "belt": {
+    "capacity": 3,
+    "speed": 280,
+    "path": [
+      { "x": 40, "y": 620 },
+      { "x": 40, "y": 260 },
+      { "x": 680, "y": 260 },
+      { "x": 680, "y": 620 },
+      { "x": 40, "y": 620 }
+    ]
+  },
+  "board": {
+    "originX": 120,
+    "originY": 340,
+    "cellSize": 48
+  },
+  "inventory": [
+    { "color": "white", "ammo": 10, "chainId": "c1" },
+    { "color": "white", "ammo": 10, "chainId": "c1" },
+    { "color": "red", "ammo": 10 },
+    { "color": "red", "ammo": 10, "hidden": true }
+  ],
+  "win": { "type": "clearAllCubes" }
+}

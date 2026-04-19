@@ -1,0 +1,39 @@
+{
+  "id": "level-05",
+  "title": "Gem",
+  "image": "levels/level-05.png",
+  "palette": {
+    "#e74c3c": "red",
+    "#3498db": "blue",
+    "#2ecc71": "green",
+    "#f1c40f": "yellow",
+    "#e91e63": "pink",
+    "#9b59b6": "purple",
+    "#e67e22": "orange",
+    "#fefefe": "white",
+    "#111111": "black"
+  },
+  "belt": {
+    "capacity": 2,
+    "speed": 260,
+    "path": [
+      { "x": 98, "y": 730 },
+      { "x": 98, "y": 220 },
+      { "x": 622, "y": 220 },
+      { "x": 622, "y": 730 },
+      { "x": 98, "y": 730 }
+    ]
+  },
+  "board": {
+    "originX": 178,
+    "originY": 300,
+    "cellSize": 52
+  },
+  "inventory": [
+    { "color": "blue", "ammo": 10, "chainId": "c1" },
+    { "color": "blue", "ammo": 10, "chainId": "c1" },
+    { "color": "yellow", "ammo": 4, "hidden": true },
+    { "color": "pink", "ammo": 1, "locked": "cubesOfColorCleared:yellow:4" }
+  ],
+  "win": { "type": "clearAllCubes" }
+}
