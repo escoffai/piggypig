@@ -3,6 +3,8 @@
 
 import Phaser from 'phaser';
 import { COLOR_HEX } from '../config';
+import { drawGlyph } from '../systems/Glyphs';
+import { isColorBlind } from '../systems/Progress';
 import type { Pig } from '../types';
 
 export class PigSprite {
@@ -35,6 +37,11 @@ export class PigSprite {
       })
       .setOrigin(0.5);
     this.container.add([this.body, this.earL, this.earR, this.snout, this.label]);
+    // Color-blind glyph: small stamp in the top-left corner of the pig body.
+    if (isColorBlind()) {
+      const glyphs = drawGlyph(scene, pig.color, -s * 0.3, -s * 0.3, s * 0.55);
+      this.container.add(glyphs as Phaser.GameObjects.GameObject[]);
+    }
   }
 
   update(): void {

@@ -13,9 +13,10 @@ import {
   SLOT_GAP,
   SLOT_SIZE,
 } from '../config';
+import { drawGlyph } from '../systems/Glyphs';
 import { isEntryTappable } from '../systems/InventorySystem';
 import { evaluateLock } from '../systems/Locks';
-import { loadProgress, markTutorialSeen } from '../systems/Progress';
+import { isColorBlind, loadProgress, markTutorialSeen, setColorBlind } from '../systems/Progress';
 import { isMuted, setMuted, sfxTap } from '../systems/SoundSystem';
 import type { GameState, InventoryEntry, Pig, Slot } from '../types';
 
@@ -79,6 +80,31 @@ export class UIScene extends Phaser.Scene {
     this.muteBtn.on('pointerdown', () => {
       setMuted(!isMuted());
       this.muteBtn.setText(isMuted() ? '🔇' : '🔊');
+    });
+
+    // Color-blind toggle. Adjacent to the mute button; renders a tiny sample
+    // glyph so it is recognisable even when the setting is OFF.
+    const cbBtn = this.add
+      .rectangle(LOGICAL_WIDTH - 100, 40, 56, 44, 0x1e293b, 0.6)
+      .setStrokeStyle(2, isColorBlind() ? 0x2ecc71 : 0x334155);
+    const cbLabel = this.add
+      .text(LOGICAL_WIDTH - 100, 40, 'A11y', {
+        fontFamily: 'Arial Black, Arial, sans-serif',
+        fontSize: '16px',
+        color: isColorBlind() ? '#2ecc71' : '#94a3b8',
+      })
+      .setOrigin(0.5);
+    cbBtn.setInteractive({ useHandCursor: true });
+    cbBtn.on('pointerdown', () => {
+      const on = !isColorBlind();
+      setColorBlind(on);
+      cbBtn.setStrokeStyle(2, on ? 0x2ecc71 : 0x334155);
+      cbLabel.setColor(on ? '#2ecc71' : '#94a3b8');
+      this.rebuildInventoryLayout();
+      for (let i = 0; i < this.slotNodes.length; i++) {
+        this.renderSlotContents(i, null);
+      }
+      (this.scene.get('LevelScene') as Phaser.Scene).events.emit('pf:colorblind-changed');
     });
 
     // Capacity readout.
@@ -214,6 +240,10 @@ export class UIScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
     c.add([body, earL, earR, snout, label]);
+    if (isColorBlind()) {
+      const glyphs = drawGlyph(this, color, -size * 0.3, -size * 0.3, size * 0.55);
+      c.add(glyphs as Phaser.GameObjects.GameObject[]);
+    }
     return c;
   }
 

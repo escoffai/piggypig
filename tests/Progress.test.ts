@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  isColorBlind,
   isLevelUnlocked,
   loadProgress,
   markTutorialSeen,
   recordLevelCleared,
   saveProgress,
+  setColorBlind,
 } from '../src/systems/Progress';
 
 // In-memory localStorage stub.
@@ -74,8 +76,21 @@ describe('Progress', () => {
     expect(loadProgress().tutorial.slotSeen).toBe(true);
   });
 
+  it('setColorBlind round-trips through storage', () => {
+    expect(isColorBlind()).toBe(false);
+    setColorBlind(true);
+    expect(isColorBlind()).toBe(true);
+    expect(loadProgress().settings.colorBlind).toBe(true);
+    setColorBlind(false);
+    expect(isColorBlind()).toBe(false);
+  });
+
   it('survives corrupt JSON by returning blank', () => {
-    saveProgress({ levels: { a: { cleared: true, stars: 3 } }, tutorial: { inventorySeen: true, slotSeen: true } });
+    saveProgress({
+      levels: { a: { cleared: true, stars: 3 } },
+      tutorial: { inventorySeen: true, slotSeen: true },
+      settings: { colorBlind: true },
+    });
     window.localStorage.setItem('pixel-flow-progress-v1', '{broken');
     const p = loadProgress();
     expect(p.levels).toEqual({});

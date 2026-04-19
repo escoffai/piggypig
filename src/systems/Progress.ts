@@ -1,14 +1,20 @@
-// Progress persistence: per-level cleared flag + star rating.
-// Stored in localStorage; gracefully no-ops outside the browser.
+// Progress persistence: per-level cleared flag + star rating, plus global
+// accessibility settings. Stored in localStorage; gracefully no-ops outside
+// the browser.
 
 export interface LevelProgress {
   cleared: boolean;
   stars: number;
 }
 
+export interface Settings {
+  colorBlind: boolean;
+}
+
 export interface Progress {
   levels: Record<string, LevelProgress>;
   tutorial: { inventorySeen: boolean; slotSeen: boolean };
+  settings: Settings;
 }
 
 const KEY = 'pixel-flow-progress-v1';
@@ -23,7 +29,11 @@ function safeStorage(): Storage | null {
 }
 
 function blank(): Progress {
-  return { levels: {}, tutorial: { inventorySeen: false, slotSeen: false } };
+  return {
+    levels: {},
+    tutorial: { inventorySeen: false, slotSeen: false },
+    settings: { colorBlind: false },
+  };
 }
 
 export function loadProgress(): Progress {
@@ -38,6 +48,9 @@ export function loadProgress(): Progress {
       tutorial: {
         inventorySeen: !!parsed.tutorial?.inventorySeen,
         slotSeen: !!parsed.tutorial?.slotSeen,
+      },
+      settings: {
+        colorBlind: !!parsed.settings?.colorBlind,
       },
     };
   } catch {
@@ -71,6 +84,17 @@ export function markTutorialSeen(kind: 'inventory' | 'slot'): Progress {
   else p.tutorial.slotSeen = true;
   saveProgress(p);
   return p;
+}
+
+export function setColorBlind(on: boolean): Progress {
+  const p = loadProgress();
+  p.settings.colorBlind = on;
+  saveProgress(p);
+  return p;
+}
+
+export function isColorBlind(): boolean {
+  return loadProgress().settings.colorBlind;
 }
 
 export function isLevelUnlocked(

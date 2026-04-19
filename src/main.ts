@@ -32,3 +32,14 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 new Phaser.Game(config);
+
+// Register the service worker in production only. Vite sets import.meta.env.DEV=true
+// during `npm run dev`; a live SW would interfere with HMR there.
+if ('serviceWorker' in navigator && !import.meta.env.DEV) {
+  window.addEventListener('load', () => {
+    const base = (import.meta.env.BASE_URL ?? './').replace(/\/?$/, '/');
+    navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+      // SW registration is best-effort; game works without it.
+    });
+  });
+}

@@ -71,6 +71,7 @@ export class LevelScene extends Phaser.Scene {
     this.events.on('pf:quit', () => this.handleQuit());
     this.events.on('pf:retry', () => this.handleRetry());
     this.events.on('pf:next', () => this.handleNext());
+    this.events.on('pf:colorblind-changed', () => this.refreshCubeGlyphs());
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.removeAllListeners('pf:deploy-inventory');
@@ -78,6 +79,7 @@ export class LevelScene extends Phaser.Scene {
       this.events.removeAllListeners('pf:quit');
       this.events.removeAllListeners('pf:retry');
       this.events.removeAllListeners('pf:next');
+      this.events.removeAllListeners('pf:colorblind-changed');
     });
   }
 
@@ -239,6 +241,13 @@ export class LevelScene extends Phaser.Scene {
     for (const cube of this.state.cubes.values()) {
       const sprite = new CubeSprite(this, cube, board);
       this.cubeSprites.set(`${cube.gridX},${cube.gridY}`, sprite);
+    }
+  }
+
+  private refreshCubeGlyphs(): void {
+    const board = this.state.level.board;
+    for (const cs of this.cubeSprites.values()) {
+      cs.refreshGlyphs(this, board);
     }
   }
 
