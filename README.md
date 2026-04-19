@@ -20,7 +20,32 @@ npm run lint      # eslint
 ```
 
 Requires Node 18+. CI runs on every push and PR via `.github/workflows/ci.yml`
-(lint + test + build + dist artifact upload).
+(lint + test + build + dist artifact upload). Pushes to `main` also deploy the
+built `dist/` to GitHub Pages via `.github/workflows/deploy.yml`.
+
+---
+
+## Deploy
+
+### GitHub Pages (included)
+
+`.github/workflows/deploy.yml` builds and publishes `dist/` on every push to
+`main`. One-time setup in the repo settings:
+
+1. **Settings → Pages → Build and deployment → Source**: `GitHub Actions`.
+2. Push to `main`. The `Deploy` workflow will build, upload the Pages artifact,
+   and publish. The deployed URL is surfaced on the workflow's `deploy` job.
+
+`vite.config.ts` uses `base: './'`, so the build works both at a repo root
+(`username.github.io`) and a subpath (`username.github.io/piggypig/`) without
+further configuration.
+
+### Any other static host
+
+`npm run build` emits a self-contained `dist/` folder. Upload it to Netlify,
+Vercel, Cloudflare Pages, S3 + CloudFront, or any CDN — no server runtime
+required. Ensure the host serves `*.json` and `*.png` from `/levels/` (they are
+copied into `dist/levels/` by the Vite plugin in `vite.config.ts`).
 
 ---
 
