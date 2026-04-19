@@ -58,6 +58,13 @@ export default defineConfig({
     target: 'es2020',
     outDir: 'dist',
     assetsInlineLimit: 0,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          phaser: ['phaser'],
+        },
+      },
+    },
   },
   test: {
     globals: true,
